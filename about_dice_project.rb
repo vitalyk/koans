@@ -10,7 +10,7 @@ class DiceSet
   end
 
   def roll(number)
-    @values = (1..number).to_a.shuffle
+    @values = (1..number).map { rand(6) + 1 }
   end
 end
 
