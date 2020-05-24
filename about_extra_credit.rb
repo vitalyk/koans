@@ -11,10 +11,11 @@ require './about_scoring_project'
 
 class Player
   attr_reader :name
-  attr_accessor :score
+  attr_accessor :score, :dice
 
-  def initialize(name)
+  def initialize(name, dice = nil)
     @name = name
+    @dice = dice
   end
 end
 
@@ -25,35 +26,36 @@ class Game
   end
 
   def play
-    puts "!!!START GAME!!!"
+    puts "\n!!!START GAME!!!"
     @players.each do |player|
       puts "---------------------------------"
 
-      dice = @dice_set.roll(5)
-      print "#{player.name} has rolls: #{dice}\n"
+      # it possible to use predefined dice as the second parameter for the testing
+      # or generate random unless provide
+      player.dice ||= @dice_set.roll(5)
+      print "#{player.name} has rolls: #{player.dice}\n"
 
-      player.score = score(dice)
+      player.score = score(player.dice)
       print "Total score is: #{player.score}\n"
       puts "---------------------------------\n"
     end
 
-    show_winner
-    puts "!!!END GAME!!!"
+    announce_winner
+    puts "\n!!!END GAME!!!"
   end
 
   public
 
-    def show_winner
-      multiple_winners = check_if_more_than_one_winner
-
-      if multiple_winners
-        puts "There are #{multiple_winners.size} winners!"
-        multiple_winners.each_with_index do |winner, index|
-          puts "Winner #{index + 1 } is: #{winner[:name]} with score: #{winner[:score]}"
-        end
+    def announce_winner
+      winners = get_winners
+      if winners.size > 1
+        puts "There is no single winner!"
+        puts "#{winners.size} players have the same total score grater than zero:"
+        winners.each { |winner| puts "#{winner[:name]} has score: #{winner[:score]}" }
+      elsif winners.size == 1
+        puts "And the winner is: #{winners.first[:name]}, with score: #{winners.first[:score]}"
       else
-        winner = tournament_table.max_by {|table| table[:score] }
-        puts "Winner is: #{winner[:name]} with score: #{winner[:score]}"
+        puts "!!!NO WINNER THIS TIME!!!"
       end
     end
 
@@ -67,13 +69,47 @@ class Game
       score_table
     end
 
-    def check_if_more_than_one_winner
+    def get_winners
       score_table = tournament_table
       scores = score_table.map { |h| h[:score] }
-      the_same = scores.detect { |v| scores.count(v) > 1 }
-      score_table.select { |s| s[:score] == the_same } if the_same
+      max = scores.max
+      return [] if max.zero?
+      score_table.select { |s| s[:score] == max }
     end
 end
 
-players = [ Player.new("Jhon"), Player.new("Bob") ]
+## test examples to test edge cases with predefined players dices
+
+# players = [
+#     Player.new("Jhon", [4, 4, 3, 4, 2]),
+#     Player.new("Bob", [3, 5, 5, 3, 3]),
+#     Player.new("Jane", [2, 2, 1, 2, 4]),
+#     Player.new("Alice",[3, 5, 1, 1, 1])
+# ]
+
+
+# players = [
+#     Player.new("Jhon", [4, 6, 2, 2, 3]),
+#     Player.new("Bob", [1, 6, 1, 2, 6]),
+#     Player.new("Jane", [4, 2, 2, 6, 3]),
+#     Player.new("Alice",[4, 3, 2, 1, 1])
+# ]
+
+# players = [
+#     Player.new("Jhon", [4, 6, 2, 2, 3]),
+#     Player.new("Bob", [4, 6, 2, 2, 3]),
+#     Player.new("Jane", [4, 2, 2, 6, 3]),
+#     Player.new("Alice",[4, 6, 2, 2, 3])
+# ]
+#
+
+
+## all players will have randomly generated dices during the game
+players = [
+    Player.new("Jhon"),
+    Player.new("Bob"),
+    Player.new("Jane"),
+    Player.new("Alice")
+]
+
 Game.new(players).play
