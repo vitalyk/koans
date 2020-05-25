@@ -46,7 +46,7 @@ def score(dice)
         sum += number * 100 unless number == 1
         sum += 1000 if number == 1
         # add remaining rest when occurrence is more than 3
-        (occurrence - 3).times { sum += mapping[number.to_s] } if occurrence > 3
+        (occurrence - 3).times { sum += mapping.fetch(number.to_s, 0) } if occurrence > 3
       else
         # sum of any other combination
         sum += mapping.fetch(number.to_s, 0) * occurrence
