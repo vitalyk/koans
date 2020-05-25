@@ -56,11 +56,11 @@ class AboutIteration < Neo::Koan
   def test_collect_transforms_elements_of_an_array
     array = [1, 2, 3]
     new_array = array.collect { |item| item + 10 }
-    assert_equal [11,12,13], new_array
+    assert_equal [11, 12, 13], new_array
 
     # NOTE: 'map' is another name for the 'collect' operation
     another_array = array.map { |item| item + 10 }
-    assert_equal [11,12,13], another_array
+    assert_equal [11, 12, 13], another_array
   end
 
   def test_select_selects_certain_items_from_an_array
@@ -94,7 +94,7 @@ class AboutIteration < Neo::Koan
   def test_all_iteration_methods_work_on_any_collection_not_just_arrays
     # Ranges act like a collection
     result = (1..3).map { |item| item + 10 }
-    assert_equal [11,12,13], result
+    assert_equal [11, 12, 13], result
 
     # Files act like a collection of lines
     File.open("example_file.txt") do |file|
